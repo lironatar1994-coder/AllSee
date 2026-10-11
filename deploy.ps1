@@ -1,7 +1,10 @@
-# Deploys AllSee: code -> GitHub (main), then a static release -> https://lawebs.co.il/allsee/
+# Deploys AllSee: code -> GitHub (main), then a release -> https://lawebs.co.il/allsee/
 #   .\deploy.ps1                      commit + push + production
 #   .\deploy.ps1 -Target GitHub       commit + push only
 #   .\deploy.ps1 -Target Prod         production only (tree must be committed and pushed)
+# Production runs server.mjs as the "allsee" systemd service. Edits made in /allsee/admin are
+# stored on the server (/var/lib/allsee) and survive every deploy; data/seed.json is only the first copy.
+# The admin password comes from .data/admin.env (create or change it with: node tools/set-password.mjs).
 [CmdletBinding()]
 param(
     [string]$CommitMessage = 'Update AllSee',
@@ -24,6 +27,8 @@ try {
 
     # ---- GitHub ----
     if ($Target -ne 'Prod') {
+        Invoke-Checked node @('--check', 'server.mjs')
+        Invoke-Checked node @('--check', 'public/app.js')
         Invoke-Checked git @('add', '-A')
         if (@(Invoke-Checked git @('diff', '--cached', '--name-only')).Count) {
             Invoke-Checked git @('commit', '-q', '-m', $CommitMessage)
@@ -38,26 +43,28 @@ try {
     if ($Target -eq 'GitHub') { return }
 
     # ---- Production ----
+    if (-not (Test-Path '.data/admin.env')) { Invoke-Checked node @('tools/set-password.mjs') }
     $base = '/opt/allsee'
     $releaseId = Get-Date -Format 'yyyyMMdd-HHmmss'
 
-    # Ship exactly what is committed: index.html + shots/, plus the revision marker.
+    # Ship exactly what is committed, plus the revision marker.
     if (Test-Path 'dist') { Remove-Item -Recurse -Force 'dist' }
     New-Item -ItemType Directory -Force -Path 'dist/www' | Out-Null
-    Invoke-Checked git @('archive', '--format=tar', '--output=dist/src.tar', $revision, 'index.html', 'shots')
+    Invoke-Checked git @('archive', '--format=tar', '--output=dist/src.tar', $revision, 'server.mjs', 'public', 'data')
     Invoke-Checked tar.exe @('-xf', 'dist/src.tar', '-C', 'dist/www')
-    [IO.File]::WriteAllText((Join-Path $PSScriptRoot 'dist/www/revision.txt'), "$revision`n")
+    [IO.File]::WriteAllText((Join-Path $PSScriptRoot 'dist/www/REVISION'), "$revision`n")
     $archive = Join-Path $PSScriptRoot 'dist/release.tar.gz'
     Invoke-Checked tar.exe @('-czf', $archive, '-C', 'dist/www', '.')
 
-    Invoke-Checked ssh @('-o','BatchMode=yes','-o','ConnectTimeout=15',$SSHHost,"mkdir -p $base/incoming")
+    Invoke-Checked ssh @('-o','BatchMode=yes','-o','ConnectTimeout=15',$SSHHost,"install -d -m 700 $base/incoming")
     Invoke-Checked scp @('-q', $archive, "${SSHHost}:$base/incoming/$releaseId.tar.gz")
+    Invoke-Checked scp @('-q', '.data/admin.env', "${SSHHost}:$base/incoming/admin.env")
     # Uploaded rather than piped: Windows PowerShell prepends a BOM to piped stdin.
     Invoke-Checked scp @('-q', 'scripts/deploy-linux.sh', "${SSHHost}:$base/incoming/deploy-linux.sh")
     & ssh -o BatchMode=yes $SSHHost "tr -d '\r' < $base/incoming/deploy-linux.sh | bash -s -- $releaseId"
     if ($LASTEXITCODE -ne 0) { throw 'Production deployment failed (the previous release stays live)' }
 
-    $liveRevision = (Invoke-WebRequest 'https://lawebs.co.il/allsee/revision.txt' -UseBasicParsing -Headers @{ 'Cache-Control' = 'no-cache' }).Content.Trim()
-    if ($liveRevision -ne $revision) { throw "Live revision mismatch (live $liveRevision, expected $revision)" }
-    Write-Host "Live: https://lawebs.co.il/allsee/  ($($revision.Substring(0, 7)))" -ForegroundColor Green
+    $health = Invoke-RestMethod 'https://lawebs.co.il/allsee/api/health' -Headers @{ 'Cache-Control' = 'no-cache' }
+    if ($health.revision -ne $revision) { throw "Live revision mismatch (live $($health.revision), expected $revision)" }
+    Write-Host "Live: https://lawebs.co.il/allsee/  ($($revision.Substring(0, 7)), $($health.sites) sites)  Edit: https://lawebs.co.il/allsee/admin" -ForegroundColor Green
 } finally { Pop-Location }

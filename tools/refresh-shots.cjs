@@ -1,4 +1,4 @@
-// Re-take site screenshots: node tools/refresh-shots.cjs "<Work>/Portfolio/node_modules/playwright" shots "C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe"
+// Re-take site screenshots: node tools/refresh-shots.cjs "<Work>/Portfolio/node_modules/playwright" public/shots "C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe"
 const { chromium } = require(process.argv[2]);
 const out = process.argv[3];
 const list = [

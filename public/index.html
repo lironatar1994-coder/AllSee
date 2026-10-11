@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>AllSee</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%231A2230'/%3E%3Ccircle cx='16' cy='16' r='7' fill='none' stroke='%23fff' stroke-width='3'/%3E%3Ccircle cx='16' cy='16' r='2.5' fill='%233D5AFE'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<!--BOOT-->
+</head>
+<body>
+<div class="adminbar" id="adminbar" hidden>
+  <div class="wrap adminbar-in">
+    <div class="ab-state"><span class="ab-dot"></span><b>מצב עריכה</b><span id="dirtyNote">הכול שמור</span></div>
+    <div class="ab-actions">
+      <button class="ab-btn" type="button" id="addSite">הוספת אתר</button>
+      <button class="ab-btn" type="button" id="openSettings">הגדרות העמוד</button>
+      <button class="ab-btn" type="button" id="discard" disabled>ביטול שינויים</button>
+      <button class="ab-btn primary" type="button" id="save" disabled>שמירה</button>
+      <button class="ab-btn ghost" type="button" id="logout">יציאה</button>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+  <header class="top">
+    <a class="brand" href="./" id="brandLink">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="9" fill="currentColor"/><circle cx="16" cy="16" r="7" fill="none" stroke="var(--bg)" stroke-width="3"/><circle cx="16" cy="16" r="2.5" fill="var(--accent)"/></svg>
+      <span id="brandName" data-setting="brand">AllSee</span>
+    </a>
+    <div class="top-right">
+      <div class="counts" id="counts"></div>
+      <button class="theme" id="theme" type="button" aria-label="מעבר בין מצב בהיר לכהה">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <section class="hero">
+    <label class="search">
+      <span class="vh">חיפוש אתר</span>
+      <input id="q" type="search" dir="auto" autocomplete="off" spellcheck="false" placeholder="איזה אתר?">
+    </label>
+    <div class="hint">
+      <span data-setting="hint" id="hintText"></span>
+      <span class="keys"><kbd>Enter</kbd> פותח את האתר המסומן</span>
+      <span class="keys"><kbd>↑</kbd> <kbd>↓</kbd> <kbd>→</kbd> <kbd>←</kbd> מעבר בין אתרים</span>
+      <span class="keys"><kbd>Esc</kbd> ניקוי</span>
+    </div>
+  </section>
+
+  <div class="bar">
+    <div class="filters" id="filters" role="group" aria-label="סינון"></div>
+    <label class="sort">סדר
+      <select id="sort">
+        <option value="manual">הסדר שלי</option>
+        <option value="recent">נפתחו לאחרונה</option>
+        <option value="updated">עבדתי עליהם לאחרונה</option>
+        <option value="az">א׳ עד ת׳</option>
+      </select>
+    </label>
+  </div>
+  <p class="edit-tip" id="editTip" hidden>גוררים כרטיס כדי לשנות את הסדר, או משתמשים בחצים. לוחצים על שם או תיאור כדי לערוך אותם במקום. את כל השאר עורכים בכפתור העיפרון.</p>
+
+  <main>
+    <div class="grid" id="grid"></div>
+    <p class="empty" id="empty"></p>
+
+    <section class="section" id="localSec">
+      <h2 data-setting="localTitle"></h2>
+      <p data-setting="localText"></p>
+      <div class="rows" id="local"></div>
+    </section>
+
+    <section class="section" id="ghSec">
+      <h2 data-setting="ghTitle"></h2>
+      <p data-setting="ghText"></p>
+      <div class="rows" id="gh"></div>
+    </section>
+  </main>
+
+  <footer>
+    <span data-setting="footer"></span>
+    <span id="statusNote">בודק אילו אתרים עונים…</span>
+    <a href="admin" id="adminLink" class="foot-link">עריכה</a>
+  </footer>
+</div>
+
+<!-- Login -->
+<div class="login" id="login" hidden>
+  <form class="login-card" id="loginForm" novalidate>
+    <svg class="login-mark" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="9" fill="currentColor"/><circle cx="16" cy="16" r="7" fill="none" stroke="var(--surface)" stroke-width="3"/><circle cx="16" cy="16" r="2.5" fill="var(--accent)"/></svg>
+    <h1>כניסה לעריכה</h1>
+    <p>הצפייה בעמוד פתוחה לכולם. כדי לשנות שמות, תיאורים או סדר צריך סיסמה.</p>
+    <label class="field">
+      <span>סיסמה</span>
+      <input type="password" id="password" autocomplete="current-password" required dir="ltr">
+    </label>
+    <p class="login-error" id="loginError" role="alert"></p>
+    <button class="btn primary wide" type="submit" id="loginBtn">כניסה</button>
+    <a class="login-back" href="./">חזרה לעמוד בלי לערוך</a>
+  </form>
+</div>
+
+<!-- Site editor -->
+<dialog class="drawer" id="editor" aria-labelledby="edTitle">
+  <form method="dialog" id="edForm" novalidate>
+    <header class="dr-head">
+      <h2 id="edTitle">עריכת אתר</h2>
+      <button class="icon-btn" type="button" data-close aria-label="סגירה">✕</button>
+    </header>
+    <div class="dr-body">
+      <div class="shot-edit">
+        <img id="edShot" alt="">
+        <div>
+          <label class="btn small"><input type="file" id="edShotFile" accept="image/jpeg,image/png,image/webp" hidden>העלאת צילום מסך</label>
+          <p class="help">JPG, PNG או WebP עד 5MB. מומלץ 1280×800.</p>
+        </div>
+      </div>
+      <div class="two">
+        <label class="field"><span>שם</span><input name="name" required maxlength="80"></label>
+        <label class="field"><span>שם משני</span><input name="sub" maxlength="80" placeholder="למשל השם באנגלית"></label>
+      </div>
+      <label class="field"><span>תיאור</span><textarea name="what" rows="3" maxlength="400"></textarea></label>
+      <div class="two">
+        <label class="field"><span>סוג</span><select name="kind"></select></label>
+        <label class="field"><span>איפה הוא רץ</span>
+          <select name="place">
+            <option value="live">אתר חי (כרטיס עם צילום מסך)</option>
+            <option value="local">רק על המחשב הזה</option>
+            <option value="github">רק ב־GitHub</option>
+          </select>
+        </label>
+      </div>
+      <label class="field"><span>כתובת ראשית</span><input name="url" type="url" dir="ltr" placeholder="https://"></label>
+      <label class="check"><input type="checkbox" name="signIn"> הכתובת הראשית היא דף כניסה (מוסיף כפתור „דף כניסה”)</label>
+
+      <fieldset class="links-edit">
+        <legend>קישורים נוספים</legend>
+        <div id="edExtra"></div>
+        <button class="btn small" type="button" id="edAddExtra">הוספת קישור</button>
+      </fieldset>
+
+      <div class="two">
+        <label class="field"><span>כתובת מקומית</span><input name="local" type="url" dir="ltr" placeholder="http://localhost:3000"></label>
+        <label class="field"><span>תאריך עבודה אחרון</span><input name="updated" type="date"></label>
+      </div>
+      <div class="two">
+        <label class="field"><span>מאגר GitHub</span><input name="repo" dir="ltr" placeholder="RepoName"></label>
+        <label class="field"><span>מאגרים נוספים</span><input name="repos" dir="ltr" placeholder="מופרדים בפסיק"></label>
+      </div>
+      <label class="field"><span>תיקיות ב־Work</span><input name="folders" dir="ltr" placeholder="מופרדות בפסיק"></label>
+      <label class="field"><span>מילות חיפוש</span><input name="tags" maxlength="500" placeholder="מילים נוספות שיעזרו למצוא את האתר"></label>
+      <label class="check"><input type="checkbox" name="hidden"> להסתיר מהעמוד הציבורי</label>
+      <p class="form-error" id="edError" role="alert"></p>
+    </div>
+    <footer class="dr-foot">
+      <button class="btn danger" type="button" id="edDelete">מחיקת האתר</button>
+      <span class="grow"></span>
+      <button class="btn" type="button" data-close>ביטול</button>
+      <button class="btn primary" type="submit">עדכון</button>
+    </footer>
+  </form>
+</dialog>
+
+<!-- Page settings -->
+<dialog class="drawer" id="settings" aria-labelledby="stTitle">
+  <form method="dialog" id="stForm">
+    <header class="dr-head">
+      <h2 id="stTitle">הגדרות העמוד</h2>
+      <button class="icon-btn" type="button" data-close aria-label="סגירה">✕</button>
+    </header>
+    <div class="dr-body">
+      <label class="field"><span>שם העמוד</span><input name="brand" maxlength="40"></label>
+      <label class="field"><span>טקסט בשדה החיפוש</span><input name="placeholder" maxlength="60"></label>
+      <label class="field"><span>שורת עזרה מתחת לחיפוש</span><input name="hint" maxlength="200"></label>
+      <label class="field"><span>סדר ברירת המחדל לתצוגה</span>
+        <select name="defaultSort">
+          <option value="manual">הסדר שלי (כמו שסידרתי)</option>
+          <option value="recent">נפתחו לאחרונה</option>
+          <option value="updated">עבדתי עליהם לאחרונה</option>
+          <option value="az">א׳ עד ת׳</option>
+        </select>
+      </label>
+      <fieldset class="links-edit">
+        <legend>שמות הסינונים</legend>
+        <div class="three">
+          <label class="field"><span>לקוחות</span><input name="kind_client" maxlength="40"></label>
+          <label class="field"><span>מוצרים</span><input name="kind_product" maxlength="40"></label>
+          <label class="field"><span>כלים</span><input name="kind_tool" maxlength="40"></label>
+        </div>
+      </fieldset>
+      <label class="field"><span>כותרת „רץ על המחשב”</span><input name="localTitle" maxlength="80"></label>
+      <label class="field"><span>הסבר „רץ על המחשב”</span><textarea name="localText" rows="2" maxlength="300"></textarea></label>
+      <label class="field"><span>כותרת „רק ב־GitHub”</span><input name="ghTitle" maxlength="80"></label>
+      <label class="field"><span>הסבר „רק ב־GitHub”</span><textarea name="ghText" rows="2" maxlength="300"></textarea></label>
+      <label class="field"><span>שורת התחתית</span><input name="footer" maxlength="300"></label>
+    </div>
+    <footer class="dr-foot">
+      <span class="grow"></span>
+      <button class="btn" type="button" data-close>ביטול</button>
+      <button class="btn primary" type="submit">עדכון</button>
+    </footer>
+  </form>
+</dialog>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script src="app.js"></script>
+</body>
+</html>
