@@ -32,11 +32,51 @@
       "url": "https://www.libidiamonds.co.il/", "local": "http://localhost:3001/",
       "folders": ["LibiDiamonds"], "repo": "LibiDiamonds", "repos": ["LibiDiamonds2", "LibiDiamondsRework"], "updated": "2026-08-21",
       "tags": "יהלומים תכשיטים טבעות diamonds jewelry rings libi" },
-    { "id": "dfus", "name": "דפוס ראובן", "sub": "Dfus Reuven", "kind": "client", "place": "live", "shot": "dfus.jpg",
-      "what": "בית דפוס, עיצוב גרפי ושילוט לעסקים.",
-      "url": "https://www.dfusreuven.co.il/", "extra": [{ "label": "סביבת בדיקה", "url": "https://vee-app.co.il/DfusReuven", "admin": false }],
-      "folders": ["DfusReuven"], "repo": "DfusReuven", "updated": "2026-08-09",
-      "tags": "דפוס בית דפוס שילוט עיצוב גרפי print printing dfus reuven signs" },
+    {
+      "id": "dfus",
+      "name": "דפוס ראובן",
+      "sub": "חנות למתנות בעיצוב אישי",
+      "kind": "client",
+      "place": "live",
+      "shot": "dfus-20261015-live.jpg",
+      "what": "אתר חנות עם קטלוג מתנות, עיצוב מוצרים עם תמונה וטקסט, סל ובקשות הזמנה. כולל ניהול מוצרים, מחירים וספקים.",
+      "url": "https://www.dfusreuven.co.il/",
+      "extra": [
+        {
+          "label": "ניהול הזמנות",
+          "url": "https://www.dfusreuven.co.il/admin",
+          "admin": true
+        },
+        {
+          "label": "מוצרים",
+          "url": "https://www.dfusreuven.co.il/admin/products",
+          "admin": true
+        },
+        {
+          "label": "מחירים",
+          "url": "https://www.dfusreuven.co.il/admin/prices",
+          "admin": true
+        },
+        {
+          "label": "ספקים",
+          "url": "https://www.dfusreuven.co.il/admin/suppliers",
+          "admin": true
+        },
+        {
+          "label": "התראות במייל",
+          "url": "https://www.dfusreuven.co.il/admin/settings",
+          "admin": true
+        }
+      ],
+      "folders": [
+        "DfusReuven2"
+      ],
+      "repo": "",
+      "updated": "2026-10-15",
+      "tags": "דפוס ראובן מתנות הדפסה עיצוב אישי חנות קטלוג ניהול ספקים מחירון dfus reuven DfusReuven2 print gifts store",
+      "signIn": false,
+      "repos": []
+    },
     { "id": "alenu", "name": "עלינו", "sub": "Alenu", "kind": "client", "place": "live", "shot": "alenu.jpg",
       "what": "העברת חשבונות חשמל, מים, גז וארנונה כשעוברים דירה. האתר הציבורי של העסק של מעבר.",
       "url": "https://lawebs.co.il/alenu/", "folders": ["Maavar", "Maavar2"], "repo": "maavar", "updated": "2026-10-08",
